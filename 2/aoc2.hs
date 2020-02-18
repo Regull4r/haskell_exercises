@@ -39,10 +39,27 @@ setNounVerb :: Int -> Int -> [Int] -> [Int]
 setNounVerb noun verb list =
     replaceAtIndex 1 noun (replaceAtIndex 2 verb list)
 
+run :: [Int] -> [Int]
+run list = runProgram 0 list
 
-main :: IO()
+guessInputs :: Int -> [(Int, Int)] -> [Int] -> (Int,Int)
+guessInputs output combs list =
+    if runComb tuple list == output
+        then tuple
+    else
+        guessInputs output (tail combs) list
+        where tuple = head combs
+
+runComb :: (Int, Int) -> [Int] -> Int
+runComb tuple list =
+    head result
+        where result = run (setNounVerb (fst tuple) (snd tuple) list)
+
+-- main :: IO
 main = do
     contents <- readFile "input.txt"
     let input = map (read :: String -> Int ) (splitOn "," contents)
     let modifiedInput = replaceAtIndex 2 2 ( replaceAtIndex 1 12 input)
-    print $ runProgram 0 modifiedInput
+    print $ head (run modifiedInput)
+    let res = guessInputs 19690720 [(x,y) | x <- [1..99], y <- [1..99]] input
+    print res
